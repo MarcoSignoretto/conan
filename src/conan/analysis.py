@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd
 from matplotlib import pyplot as plt
 from pandas import DataFrame
@@ -67,10 +69,12 @@ def less_ttest_99(df: DataFrameGroupBy, metric: str, variantA: str, variantB: st
             f'(Confidence 99%): Fail to reject Null Hypothesis H0, the new variant "{variantA}" does NOT improve the metric {metric} respect to the current variant "{variantB}"')
 
 
-def study(df: DataFrame, group_by: [str], groups: [str], values: [str]):
+def study(df: DataFrame, group_by: [str], groups: [str], values: [str], hist_range: ([int] | None) = None):
     df = df.groupby(group_by)
 
     # block 1 - simple stats
+    index = 0
+    fig, axs = plt.subplots(2, 1, figsize=(15, 10))
     keys = values
     for key in keys:
         mean1 = df[key].mean()
@@ -84,6 +88,16 @@ def study(df: DataFrame, group_by: [str], groups: [str], values: [str]):
 
         group_report = []
         for group in groups:
+
+            #plot
+            axs[index].hist(df.get_group(group)[key], color='blue', edgecolor='black', bins=100, range=hist_range)
+
+            axs[index].set_xlabel(f'{key}')
+            axs[index].set_ylabel('Occurences')
+            axs[index].set_title(f'{group}')
+            index = index + 1
+
+            #report
             group_report.append(
                 [group, mean1[group], median1[group], std1[group], str(var1[group]), max1[group], min1[group],
                  count1[group]], )
@@ -96,6 +110,4 @@ def study(df: DataFrame, group_by: [str], groups: [str], values: [str]):
         )
         print()
 
-    df.hist(bins=100, range=(0, 1000))
     plt.show()
-    # plt.show(block=False)
