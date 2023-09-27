@@ -7,6 +7,19 @@ from pandas.core.groupby import DataFrameGroupBy
 from tabulate import tabulate
 
 
+def print_difference(name: str, original: float, new: float):
+    """
+    Compute the difference between two values and print it in absolute diff and percentage diff
+    :param name: name of the metric
+    :param original: original value
+    :param new: new value
+    """
+    print(f"======== {name} =========")
+    print(f"diff: {original - new}")
+    sign = "-" if original > new else "+"
+    print(f"percentage diff: {sign}{100 - ((100 * new) / original)}")
+
+
 def dataframe(csv_path: str) -> DataFrame:
     """
     Load a dataframe from a CSV file and print the head of the file
@@ -88,16 +101,16 @@ def study(df: DataFrame, group_by: [str], groups: [str], values: [str], hist_ran
 
         group_report = []
         for group in groups:
-
-            #plot
+            # plot
             axs[index].hist(df.get_group(group)[key], color='blue', edgecolor='black', bins=100, range=hist_range)
 
             axs[index].set_xlabel(f'{key}')
             axs[index].set_ylabel('Occurences')
             axs[index].set_title(f'{group}')
+            axs[index].grid()
             index = index + 1
 
-            #report
+            # report
             group_report.append(
                 [group, mean1[group], median1[group], std1[group], str(var1[group]), max1[group], min1[group],
                  count1[group]], )
